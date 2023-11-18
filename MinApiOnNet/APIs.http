@@ -1,0 +1,19 @@
+
+@baseUrl = https://localhost:7216
+
+### @name login
+POST https://localhost:44305/api/signin/individual
+Content-Type: application/json
+
+{
+    "email": "tvorog08@meta.ua",
+    "password": "Install_new01!"
+}
+
+###
+@token = {{login.response.body.$1.accessToken}}
+
+### @name all-items
+
+GET {{baseUrl}}/todoitems
+Authorization: Bearer {{token}}

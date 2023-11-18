@@ -1,0 +1,59 @@
+
+# deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  minimalapi
+  namespace: default
+  labels:
+    app:  minimalapi
+spec:
+  selector:
+    matchLabels:
+      app: minimalapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  minimalapi
+    spec:
+      containers:
+      - name:  minimalapi
+        image:  miniapis6:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 1
+            memory: 256Mi
+          limits:
+            cpu: 1 # 1 is equal to 1 virtual CPU; 1 = workstation gc; > 1 = server gc;
+            memory: 1024Mi
+        ports:
+        - containerPort:  80
+          name:  minimalapi
+      restartPolicy: Always
+
+---
+
+# node service
+apiVersion: v1
+kind: Service
+metadata:
+  name: minimalapi
+  namespace: default
+spec:
+  selector:
+    app: minimalapi
+  type: NodePort
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: minimalapi
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    # If you set the `spec.type` field to `NodePort` and you want a specific port number,
+    # you can specify a value in the `spec.ports[*].nodePort` field.
+    # nodePort: 80
